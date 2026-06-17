@@ -1,0 +1,26 @@
+#!/bin/bash
+set -eu
+export LC_ALL=C
+if [ ! -r /boot/YAOSHI/RUNTIME/PREPARE ]; then
+  for _ in {1..120}; do
+    /bin/mount /boot 2>/dev/null || true
+    /bin/mount -t vfat -o ro,nosuid,nodev,noatime,umask=022,shortname=mixed LABEL=YAOSHI_ESP /boot 2>/dev/null || true
+    [ -r /boot/YAOSHI/RUNTIME/PREPARE ] && break
+    /bin/sleep 0.5
+  done
+fi
+if [ ! -r /boot/YAOSHI/RUNTIME/PREPARE ]; then
+  printf '%s\n' 'missing Yaoshi runtime prepare' >&2
+  exit 1
+fi
+if [ ! -r /boot/YAOSHI/CONFIG/HOSTNAME ] || [ ! -r /boot/YAOSHI/CONFIG/AUTHKEYS ]; then
+  printf '%s\n' 'missing Yaoshi runtime config' >&2
+  exit 1
+fi
+rm -rf /run/yaoshi-prepare
+mkdir -p /run/yaoshi-prepare
+YAOSHI_PREPARE_HOSTNAME="$(cat /boot/YAOSHI/CONFIG/HOSTNAME)"
+YAOSHI_PREPARE_AUTHKEYS="$(cat /boot/YAOSHI/CONFIG/AUTHKEYS)"
+export YAOSHI_PREPARE_HOSTNAME YAOSHI_PREPARE_AUTHKEYS
+cp /boot/YAOSHI/RUNTIME/PREPARE /run/yaoshi-prepare/PREPARE
+exec /bin/bash /run/yaoshi-prepare/PREPARE

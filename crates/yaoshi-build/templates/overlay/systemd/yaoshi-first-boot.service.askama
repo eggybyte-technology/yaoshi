@@ -1,0 +1,15 @@
+[Unit]
+Description=Yaoshi first boot script
+After=yaoshi-prepare.service
+Requires=yaoshi-prepare.service
+Before=ssh.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/yaoshi/first-boot-launcher
+TimeoutStartSec=75
+RemainAfterExit=yes
+User=root
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+#!/bin/sh
+set -eu
+root="$1"
+out="$root/YAOSHI-EXPORT"
+rm -rf "$out"
+mkdir -p "$out/boot/modules"
+cp "$root/var/lib/dpkg/status" "$out/dpkg.status"
+kernel=$(find "$root/lib/modules" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | LC_ALL=C sort | tail -n 1)
+test -n "$kernel"
+cp "$root/boot/vmlinuz-$kernel" "$out/boot/vmlinuz"
+cp "$root/boot/initrd.img-$kernel" "$out/boot/initrd.img"
+cp "$root/boot/config-$kernel" "$out/boot/config"
+cp "$root/usr/lib/systemd/boot/efi/systemd-bootx64.efi.signed" "$out/boot/systemd-bootx64.efi.signed"
+printf '%s\n' "$kernel" > "$out/boot/KERNEL-RELEASE"
+cp -a "$root/lib/modules/$kernel" "$out/boot/modules/$kernel"

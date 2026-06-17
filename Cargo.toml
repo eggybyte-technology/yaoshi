@@ -1,0 +1,22 @@
+[workspace]
+members = [
+  "crates/yaoshi",
+  "crates/yaoshi-build",
+  "crates/yaoshi-common",
+  "crates/yaoshi-debian",
+  "crates/yaoshi-image",
+  "crates/yaoshi-initramfs",
+  "crates/yaoshi-payload",
+  "crates/yaoshi-screen",
+  "crates/yaoshi-installer",
+  "crates/yaoshi-dashboard",
+  "crates/yaoshi-test",
+]
+resolver = "3"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.96.0"
+version = "0.0.1"
+license = "Apache-2.0"
+authors = ["Eggybyte Technology"]

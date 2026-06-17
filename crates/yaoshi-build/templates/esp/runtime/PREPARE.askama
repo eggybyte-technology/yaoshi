@@ -1,0 +1,100 @@
+{% raw -%}
+#!/bin/bash
+set -eu
+export LC_ALL=C
+mkdir -p /var/lib/yaoshi /root/.ssh
+
+write_state_file() {
+  path="$1"
+  value="$2"
+  printf '%s\n' "${value}" > "${path}.tmp"
+  mv "${path}.tmp" "${path}"
+}
+
+write_root_growth_state() {
+  write_state_file /var/lib/yaoshi/root-growth-state "$1"
+}
+
+write_prepare_state() {
+  write_state_file /var/lib/yaoshi/prepare-state "$1"
+}
+
+prepare_done=0
+mark_prepare_failed() {
+  if [ "${prepare_done}" != 1 ]; then
+    write_prepare_state failed || true
+  fi
+}
+trap mark_prepare_failed EXIT
+
+rm -f /var/lib/yaoshi/root-growth-state.tmp /var/lib/yaoshi/config-state.tmp /var/lib/yaoshi/prepare-state.tmp
+write_prepare_state running
+
+if [ -z "${YAOSHI_PREPARE_HOSTNAME+x}" ]; then
+  printf '%s\n' 'missing hostname config' >&2
+  exit 1
+fi
+host="${YAOSHI_PREPARE_HOSTNAME}"
+case "${host}" in
+  ''|'-'*|*'-'|*[!A-Za-z0-9-]*)
+    printf '%s\n' 'invalid hostname config' >&2
+    exit 1
+    ;;
+esac
+if [ "${#host}" -gt 63 ]; then
+  printf '%s\n' 'invalid hostname config' >&2
+  exit 1
+fi
+printf '%s\n' "${host}" > /etc/hostname.yaoshi.tmp
+cat > /etc/hosts.yaoshi.tmp <<EOF
+127.0.0.1 localhost
+127.0.1.1 ${host}
+::1 localhost ip6-localhost ip6-loopback
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+EOF
+
+if [ -z "${YAOSHI_PREPARE_AUTHKEYS+x}" ]; then
+  printf '%s\n' 'missing authorized_keys config' >&2
+  exit 1
+fi
+: > /root/.ssh/authorized_keys.yaoshi.tmp
+while IFS= read -r line || [ -n "${line}" ]; do
+  case "${line}" in
+    ''|*[![:print:]]*) ;;
+    *) printf '%s\n' "${line}" >> /root/.ssh/authorized_keys.yaoshi.tmp ;;
+  esac
+done <<< "${YAOSHI_PREPARE_AUTHKEYS}"
+if [ ! -s /root/.ssh/authorized_keys.yaoshi.tmp ]; then
+  printf '%s\n' 'empty authorized_keys config' >&2
+  exit 1
+fi
+
+if [ ! -e /var/lib/yaoshi/root-expanded ]; then
+  if /usr/bin/systemd-repart --dry-run=no --empty=refuse --discard=no --definitions=/usr/lib/yaoshi/repart.d && /usr/lib/systemd/systemd-growfs /; then
+    write_root_growth_state expanded
+    touch /var/lib/yaoshi/root-expanded
+  else
+    write_root_growth_state failed
+  fi
+elif [ -r /var/lib/yaoshi/root-growth-state ]; then
+  :
+else
+  write_root_growth_state expanded
+fi
+
+mv /etc/hostname.yaoshi.tmp /etc/hostname
+/bin/hostname "${host}" 2>/dev/null || true
+mv /etc/hosts.yaoshi.tmp /etc/hosts
+chown root:root /root/.ssh /root/.ssh/authorized_keys.yaoshi.tmp /etc/hostname /etc/hosts
+chmod 0700 /root/.ssh
+chmod 0644 /etc/hosts
+chmod 0600 /root/.ssh/authorized_keys.yaoshi.tmp
+mv /root/.ssh/authorized_keys.yaoshi.tmp /root/.ssh/authorized_keys
+
+write_state_file /var/lib/yaoshi/config-state applied
+write_prepare_state applied
+prepare_done=1
+trap - EXIT
+exit 0
+{% endraw %}

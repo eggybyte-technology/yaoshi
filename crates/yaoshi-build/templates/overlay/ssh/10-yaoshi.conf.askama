@@ -1,0 +1,4 @@
+PermitRootLogin yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+PubkeyAuthentication yes

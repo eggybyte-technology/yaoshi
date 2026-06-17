@@ -1,0 +1,10 @@
+[profile.default]
+default-filter = 'not test(/^qemu::/)'
+fail-fast = false
+retries = 0
+flaky-result = "fail"
+slow-timeout = "60s"
+
+[profile.qemu]
+test-threads = 1
+default-filter = 'test(qemu::flow)'

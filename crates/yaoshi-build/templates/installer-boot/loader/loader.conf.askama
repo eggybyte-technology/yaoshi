@@ -1,0 +1,3 @@
+default yaoshi-installer.conf
+timeout 0
+editor no

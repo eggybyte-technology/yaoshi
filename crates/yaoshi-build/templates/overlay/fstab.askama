@@ -1,0 +1,2 @@
+LABEL=YAOSHI_ROOT / ext4 defaults,noatime 0 1
+LABEL=YAOSHI_ESP /boot vfat ro,nosuid,nodev,noatime,umask=022,shortname=mixed 0 2

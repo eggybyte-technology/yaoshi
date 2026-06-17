@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "mkhl.direnv",
+    "rust-lang.rust-analyzer",
+    "jnoortheen.nix-ide"
+  ],
+  "unwantedRecommendations": []
+}

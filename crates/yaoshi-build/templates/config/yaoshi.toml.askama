@@ -1,0 +1,29 @@
+[system]
+hostname = "yaoshi"
+
+[sources]
+debian = "https://mirrors.aliyun.com/debian"
+debian_security = "https://mirrors.aliyun.com/debian-security"
+
+[root]
+ssh_public_key_files = ["./keys/root.pub"]
+
+[installed]
+packages = [
+  "curl",
+  "git",
+  "sudo",
+  "less",
+  "nano",
+  "iproute2",
+  "procps",
+  "psmisc",
+  "iputils-ping",
+  "nftables",
+  "openssh-client",
+  "rsync",
+]
+
+[scripts]
+build_system = "./.yaoshi/scripts/build-system.sh"
+first_boot = "./.yaoshi/scripts/first-boot.sh"

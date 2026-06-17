@@ -1,0 +1,11 @@
+[package]
+name = "yaoshi-debian"
+edition.workspace = true
+rust-version.workspace = true
+version.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+sha2 = "0.10.9"
+yaoshi-common = { path = "../yaoshi-common" }

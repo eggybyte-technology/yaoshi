@@ -1,0 +1,5 @@
+title Yaoshi Installer
+linux /YAOSHI/BOOT/VMLINUZ
+initrd /YAOSHI/INSTALLER-BASE.CPIO.ZST
+initrd /YAOSHI/INSTALLER-APP.CPIO.ZST
+options quiet loglevel=3 yaoshi.mode=installer psi=1 console=ttyS0,115200n8 consoleblank=0 rdinit=/init

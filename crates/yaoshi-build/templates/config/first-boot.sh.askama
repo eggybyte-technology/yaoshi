@@ -1,0 +1,29 @@
+#!/bin/bash
+set -euo pipefail
+export LC_ALL=C
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+# Runs once on the first installed boot after Yaoshi prepare.
+# Failure is written to /var/log/yaoshi/first-boot.log and does not stop dashboard, tty2, or SSH.
+# Keep the identity block unless this machine is intentionally being cloned with shared identity.
+# It creates machine-unique runtime identity. It does not create root login keys.
+
+if [ ! -s /etc/machine-id ]; then
+  rm -f /etc/machine-id
+  systemd-machine-id-setup
+fi
+
+mkdir -p /var/lib/dbus
+ln -sf /etc/machine-id /var/lib/dbus/machine-id
+
+# SSH host private keys must be unique per installed machine.
+# Root authorized_keys is configured separately from .yaoshi/yaoshi.toml and is not changed here.
+rm -f /etc/ssh/ssh_host_*_key /etc/ssh/ssh_host_*_key.pub
+ssh-keygen -A
+
+# Add user first-boot commands below this line.
+# Keep commands bounded. Long-running daemons do not belong in this script.
+
+mkdir -p /var/lib/yaoshi/local
+printf '%s\n' 'first boot completed' > /var/lib/yaoshi/local/first-boot.txt
+chmod 0644 /var/lib/yaoshi/local/first-boot.txt

@@ -1,0 +1,4 @@
+{
+  "rust-analyzer.server.path": "${workspaceFolder}/.vscode/rust-analyzer-wrapper.sh",
+  "nix.serverPath": "${workspaceFolder}/.vscode/nixd-wrapper.sh"
+}

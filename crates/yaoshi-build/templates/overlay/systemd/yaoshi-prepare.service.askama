@@ -1,0 +1,14 @@
+[Unit]
+Description=Prepare Yaoshi installed runtime
+After=local-fs.target systemd-remount-fs.service
+Before=yaoshi-first-boot.service yaoshi-dashboard.service yaoshi-root-shell.service ssh.service
+RequiresMountsFor=/boot
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/yaoshi/prepare-launcher
+TimeoutStartSec=90
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

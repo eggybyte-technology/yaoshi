@@ -1,0 +1,7 @@
+/target/
+/.direnv/
+/result
+/.yaoshi/
+tmp/
+/docs/custom.md
+/docs/fix.md

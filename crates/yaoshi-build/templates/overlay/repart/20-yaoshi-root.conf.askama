@@ -1,0 +1,5 @@
+[Partition]
+Type=root-x86-64
+Label=YAOSHI_ROOT
+Weight=1000000
+PaddingWeight=0

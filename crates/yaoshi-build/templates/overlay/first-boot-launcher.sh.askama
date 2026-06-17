@@ -1,0 +1,53 @@
+#!/bin/bash
+set -u
+export LC_ALL=C
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+mkdir -p /var/lib/yaoshi /var/log/yaoshi
+
+state=/var/lib/yaoshi/first-boot-state
+attempt=/var/lib/yaoshi/first-boot-attempted
+log=/var/log/yaoshi/first-boot.log
+script=/boot/YAOSHI/RUNTIME/FIRST-BOOT
+
+write_state() {
+  printf '%s\n' "$1" > "${state}.tmp"
+  mv "${state}.tmp" "${state}"
+}
+
+if [ -e "${attempt}" ]; then
+  exit 0
+fi
+
+: > "${attempt}"
+write_state running
+
+{
+  printf '%s\n' 'Yaoshi first boot script: start'
+
+  if [ ! -r "${script}" ]; then
+    printf '%s\n' 'Yaoshi first boot script: missing'
+    write_state skipped
+    exit 0
+  fi
+
+  /usr/bin/timeout 60s /bin/bash -euo pipefail "${script}"
+  rc="$?"
+
+  case "${rc}" in
+    0)
+      printf '%s\n' 'Yaoshi first boot script: applied'
+      write_state applied
+      ;;
+    124)
+      printf '%s\n' 'Yaoshi first boot script: timeout'
+      write_state failed
+      ;;
+    *)
+      printf 'Yaoshi first boot script: failed exit=%s\n' "${rc}"
+      write_state failed
+      ;;
+  esac
+} >> "${log}" 2>&1
+
+exit 0

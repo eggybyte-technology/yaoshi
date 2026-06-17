@@ -1,0 +1,4 @@
+title Yaoshi Debian trixie
+linux /YAOSHI/BOOT/VMLINUZ
+initrd /YAOSHI/BOOT/INITRD.IMG
+options quiet loglevel=3 root=PARTUUID=5c5c9f71-bc23-4f8d-80b2-6d4bb64a0f33 rootwait rw rootfstype=ext4 systemd.unit=multi-user.target psi=1 console=ttyS0,115200n8 console=tty1 consoleblank=0

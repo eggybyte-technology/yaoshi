@@ -1,0 +1,16 @@
+#!/bin/bash
+set -euo pipefail
+export LC_ALL=C
+export DEBIAN_FRONTEND=noninteractive
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+
+# Runs inside the installed Debian root after [installed].packages are installed.
+# Files written here become part of the installed root image.
+# Nonzero exit stops image construction with BUILD.
+# Put packages in [installed].packages; keep this script for configuration and files.
+# Do not generate machine-unique identity here. First boot owns that.
+
+mkdir -p /opt/yaoshi-local
+printf '%s\n' 'customized during Yaoshi build' > /opt/yaoshi-local/README
+
+chmod 0644 /opt/yaoshi-local/README
